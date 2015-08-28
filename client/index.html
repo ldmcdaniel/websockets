@@ -1,10 +1,49 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>WebSockets</title>
+    <meta charset="utf-8">
+    <title>Websockets Demo</title>
   </head>
   <body>
-    <h1>Websockets!!</h1>
-    <script src="lib/socket.io-client/socket.io.js"></script>
+    <h1>Websockets</h1>
+    <form>
+      <input name="name" placeholder="Billy Bob">
+      <input name="text" placeholder="Howdy Ya'll!">
+      <input type="submit">
+    </form>
+    <ul></ul>
+    <script src="/lib/socket.io-client/socket.io.js"></script>
+    <script>
+      var form = document.querySelector('form');
+      var nameInput = document.querySelector('input[name="name"]');
+      var textInput = document.querySelector('input[name="text"]');
+      var ul = document.querySelector('ul');
+      var socket = io();
+      form.addEventListener('submit', function () {
+        var name = nameInput.value;
+        var text = textInput.value;
+        socket.emit('sentChatMessage', {name: name, text: text});
+        textInput.value = '';
+        event.preventDefault();
+      });
+      socket.on('connect', function () {
+        console.log('Socket connected:', socket.id);
+      });
+      socket.on('disconnect', function () {
+        console.log('Socket disconnected');
+      });
+      socket.on('recievedChatMessage', function (msg) {
+        var li = genLIElement(msg);
+        ul.appendChild(li);
+      });
+      function genLIElement(message) {
+        var name = message.name;
+        var text = message.text;
+        var li = document.createElement('li');
+        var textNode = document.createTextNode(name + ': ' + text);
+        li.appendChild(textNode);
+        return li;
+      }
+    </script>
   </body>
 </html>
